@@ -17,7 +17,7 @@ type spriteInfo struct {
 	SpriteIDs []int
 }
 
-func GroupSplitSprites(catalogContentJsonPath, appearancesFileName, splitSpitesDir, outputGroupedDir string) {
+func GroupSplitSprites(catalogContentJsonPath, appearancesFileName, splitSpitesDir, outputGroupedDir, groupsIndexOut string) {
 	datPath := filepath.Join(catalogContentJsonPath, appearancesFileName)
 	if _, err := os.Stat(datPath); err != nil {
 		log.Fatal().Msgf("[read] dat file not found: %v", err)
@@ -32,8 +32,16 @@ func GroupSplitSprites(catalogContentJsonPath, appearancesFileName, splitSpitesD
 	groups := scanSpriteInfos(data)
 	log.Debug().Msgf("[parse] found %d candidate groups (sprite-info blocks)", len(groups))
 
+	if groupsIndexOut != "" {
+		if err := WriteGroupsIndexJSON(groupsIndexOut, datPath, groups); err != nil {
+			log.Error().Err(err).Msg("[index] failed to write groups index JSON")
+		} else {
+			log.Info().Msgf("[index] wrote groups index JSON: %s", groupsIndexOut)
+		}
+	}
+
 	if err := os.MkdirAll(outputGroupedDir, 0o755); err != nil {
-		log.Fatal().Msgf("[fs] failed to create outputGroupedDir=%s: %v", outputGroupedDir, err)
+		log.Fatal().Msgf("[fs] failed to create outputGroupedDir=%s: %v", outputGroupedDir, outputGroupedDir)
 	}
 	log.Debug().Msgf("[fs] outputGroupedDir directory ready: %s", outputGroupedDir)
 
@@ -47,6 +55,7 @@ func GroupSplitSprites(catalogContentJsonPath, appearancesFileName, splitSpitesD
 		bar.OptionThrottle(100),
 		bar.OptionClearOnFinish(),
 	)
+
 	for idx, g := range groups {
 		if len(g.SpriteIDs) == 0 {
 			skipped++
@@ -79,6 +88,7 @@ func GroupSplitSprites(catalogContentJsonPath, appearancesFileName, splitSpitesD
 			_ = progress.Add(1)
 			continue
 		}
+
 		log.Debug().Int("group", idx).Str("outPNG", outPNG).Msg("wrote grouped PNG")
 		exported++
 		_ = progress.Add(1)

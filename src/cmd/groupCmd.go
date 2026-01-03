@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	GroupedOutputPath string
+	GroupedOutputPath  string
+	GroupsIndexOutPath string
 )
 
 func init() {
@@ -18,8 +19,13 @@ func init() {
 
 	groupCmd.Flags().StringVar(&SplitOutputPath, "splitOutput", defaultSplitOutputPath(), "split sprites output path")
 	groupCmd.Flags().StringVar(&GroupedOutputPath, "groupedOutput", defaultGroupedOutputPath(), "grouped sprites by appearances.json output path")
+
+	// Optional JSON index for downstream tooling (e.g., PHP outfit pipelines).
+	groupCmd.Flags().StringVar(&GroupsIndexOutPath, "groupsIndexOut", "", "write groups index JSON (optional)")
+
 	_ = viper.BindPFlag("splitOutput", groupCmd.Flags().Lookup("splitOutput"))
 	_ = viper.BindPFlag("groupedOutput", groupCmd.Flags().Lookup("groupedOutput"))
+	_ = viper.BindPFlag("groupsIndexOut", groupCmd.Flags().Lookup("groupsIndexOut"))
 }
 
 var groupCmd = &cobra.Command{
@@ -32,11 +38,12 @@ var groupCmd = &cobra.Command{
 		catalogFile := filepath.Join(catalogDir, "catalog-content.json")
 		splitOutput := app.ExpandPath(viper.GetString("splitOutput"))
 		groupedOutput := app.ExpandPath(viper.GetString("groupedOutput"))
+		groupsIndexOut := app.ExpandPath(viper.GetString("groupsIndexOut"))
 
 		appearancesFileName := app.GetAppearancesFileNameFromCatalogContent(catalogFile)
 		log.Info().Msgf("Appearances file name: %s", appearancesFileName)
 
-		app.GroupSplitSprites(catalogDir, appearancesFileName, splitOutput, groupedOutput)
+		app.GroupSplitSprites(catalogDir, appearancesFileName, splitOutput, groupedOutput, groupsIndexOut)
 
 		log.Info().Msg("Tibia Sprites group finished")
 	},
