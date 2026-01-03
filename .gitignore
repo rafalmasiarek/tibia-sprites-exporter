@@ -1,3 +1,27 @@
+# Generated outputs / extracted data
+/output/
 /src/output/
-/.idea/
-#/src
+/tmp/
+/cache/
+
+# Built binary (if you build into repo root)
+tibia-sprites-exporter
+
+# Local config (user-specific)
+.tse.yaml
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# Go artifacts
+*.test
+*.out
+*.prof
+*.pprof
+coverage.*
