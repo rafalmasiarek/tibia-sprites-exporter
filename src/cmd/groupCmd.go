@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/rs/zerolog/log"
-	"github.com/tilaven/tibia-sprites-exporter/src/app"
+	"github.com/simivar/tibia-sprites-exporter/src/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
